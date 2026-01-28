@@ -144,8 +144,8 @@ This keeps analysis **fast, safe, and explainable**.
 
 Planned enhancements:
 
--   [ ] MSI parsing via Windows Installer COM (ProductCode, UpgradeCode,
-    Version)
+-   [x] MSI parsing via Windows Installer COM (ProductCode, UpgradeCode,
+    Version) ✅
 -   [ ] install4j / Java-based installer detection
 -   [ ] Partial-read scanning for very large EXEs
 -   [ ] `--format yaml`
