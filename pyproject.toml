@@ -1,9 +1,11 @@
 [project]
 name = "installer-intel"
-version = "0.1.0"
-description = "Installer intelligence CLI that outputs an install plan (silent commands, uninstall, detection rules) from EXE/MSI"
+dynamic = ["version"]
+description = "Windows-first static installer analysis for endpoint / CPE teams"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["windows", "installer", "packaging", "endpoint", "intune", "sccm", "cpe"]
 dependencies = [
   "typer>=0.12.3",
   "rich>=13.7.1",
@@ -14,8 +16,11 @@ dependencies = [
 installer-intel = "installer_intel.cli:app"
 
 [build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.setuptools]
-packages = ["installer_intel", "installer_intel.analyzers"]
+[tool.hatch.build.targets.wheel]
+packages = ["installer_intel"]
+
+[tool.hatch.version]
+path = "installer_intel/__init__.py"

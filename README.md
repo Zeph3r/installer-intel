@@ -7,6 +7,8 @@ for endpoint management and packaging workflows.
 > Think: **package intelligence** for Intune, SCCM, Jamf, RMM, and
 > Client Platform Engineering teams.
 
+Available on [PyPI](https://pypi.org/project/installer-intel/).
+
 ------------------------------------------------------------------------
 
 ## ✨ Why installer-intel exists
@@ -95,16 +97,30 @@ Generated `installplan.json` (excerpt):
 
 ------------------------------------------------------------------------
 
-## 🚀 Installation (development)
+## 🚀 Installation
+
+**From PyPI** (recommended for users):
+
+``` powershell
+pip install installer-intel
+installer-intel --version
+installer-intel analyze .\setup.exe --out installplan.json
+```
+
+**From source** (development):
 
 This project uses **uv** for fast, reproducible Python environments.
 
 ``` powershell
 pip install uv
+git clone https://github.com/Zeph3r/installer-intel.git
+cd installer-intel
 uv venv
 uv sync
 uv run installer-intel --help
 ```
+
+Use `--quiet` / `-q` to suppress the banner when scripting (e.g. in CI or pipes).
 
 ------------------------------------------------------------------------
 

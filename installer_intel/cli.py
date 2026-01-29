@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -10,11 +11,43 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from installer_intel import __version__
 from installer_intel.analyzers import analyze_exe, analyze_msi
+from installer_intel.banner import show_banner, should_show_banner
 from installer_intel.models import InstallPlan
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 console = Console()
+
+
+@app.callback(invoke_without_command=True)
+def main(
+    ctx: typer.Context,
+    version_flag: bool = typer.Option(
+        False,
+        "--version",
+        "-v",
+        help="Show the installer-intel version and exit.",
+    ),
+) -> None:
+    """
+    Global entrypoint for the CLI.
+
+    - Handles --version at the top level.
+    - Shows the banner only for interactive runs with no subcommand
+      (i.e. `installer-intel`), not for --help/--version.
+    """
+    if version_flag:
+        console.print(__version__)
+        raise typer.Exit(0)
+
+    # Suppress banner when help is requested explicitly
+    argv = sys.argv[1:]
+    if any(arg in ("-h", "--help") for arg in argv):
+        return
+
+    if ctx.invoked_subcommand is None and should_show_banner(quiet=False):
+        show_banner()
 
 
 def _write_json(plan: InstallPlan, out_path: Path) -> None:
@@ -69,7 +102,15 @@ def _print_summary(plan: InstallPlan) -> None:
 def analyze(
     path: Path = typer.Argument(..., help="Path to installer (.msi or .exe)"),
     out: Optional[Path] = typer.Option(None, "--out", "-o", help="Output JSON path (default: ./installplan.json)"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress banner and progress bars"),
 ) -> None:
+    # Banner before any analysis output (interactive runs only):
+    # - not quiet
+    # - TTY
+    # - no explicit --out scripting path
+    if out is None and should_show_banner(quiet=quiet):
+        show_banner()
+
     p = Path(path)
     if not p.exists():
         raise typer.BadParameter(f"File not found: {p}")
