@@ -148,6 +148,7 @@ Planned enhancements:
     Version) ✅
 -   [ ] install4j / Java-based installer detection
 -   [ ] Partial-read scanning for very large EXEs
+-   [ ] ProcMon-backed trace mode (`installer-intel analyze setup.exe --trace procmon`) to capture & summarize filesystem, registry, service, and persistence changes into an auditable report
 -   [ ] `--format yaml`
 -   [ ] `--summary-only`
 -   [ ] Optional `trace-install` mode (opt-in, sandboxed)
