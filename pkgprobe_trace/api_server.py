@@ -20,5 +20,5 @@ app = create_production_app(
     base_output_dir=os.environ.get("PKGPROBE_BASE_OUTPUT_DIR", "./jobs"),
     vmrun_path=os.environ.get("TRACE_VMRUN_PATH", "vmrun"),
     trace_enabled=os.environ.get("TRACE_ENABLED", "false").lower() in ("true", "1", "yes"),
-    enable_billing=bool(os.environ.get("REDACTED", "")),
+    enable_auth=os.environ.get("PKGPROBE_API_AUTH_ENABLED", "false").lower() in ("true", "1", "yes"),
 )

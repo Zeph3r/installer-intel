@@ -301,8 +301,7 @@ This keeps analysis **fast, safe, and explainable**.
 ### Next
 
 -   Cloud API at `api.pkgprobe.io` (analyze, trace, auto-wrap)
--   Self-serve billing (Stripe) with tier-based gating
--   CLI cloud commands (`pkgprobe cloud-wrap`, `pkgprobe upgrade`)
+-   CLI cloud commands (`pkgprobe cloud-wrap`)
 -   install4j / Java-based installer detection
 -   Partial-read scanning for very large EXEs
 -   Queue-native multi-job orchestration for trace + packaging

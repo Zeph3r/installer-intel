@@ -35,14 +35,12 @@ class Customer(Base):
     __tablename__ = "customers"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    customer_id = Column(String(255), unique=True, nullable=True, index=True)
     email = Column(String(255), nullable=False, index=True)
     tier = Column(String(20), nullable=False, default="free")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     active = Column(Boolean, nullable=False, default=True)
 
     api_keys = relationship("ApiKey", back_populates="customer")
-    subscriptions = relationship("Subscription", back_populates="customer")
 
 
 class ApiKey(Base):
@@ -64,20 +62,6 @@ class ApiKey(Base):
         return self.revoked_at is None and self.customer.active
 
 
-class Subscription(Base):
-    __tablename__ = "subscriptions"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
-    stripe_subscription_id = Column(String(255), unique=True, nullable=False, index=True)
-    stripe_price_id = Column(String(255), nullable=True)
-    status = Column(String(30), nullable=False, default="active")
-    current_period_end = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
-
-    customer = relationship("Customer", back_populates="subscriptions")
-
-
 class UsageRecord(Base):
     __tablename__ = "usage_records"
 
@@ -85,7 +69,6 @@ class UsageRecord(Base):
     api_key_id = Column(Integer, ForeignKey("api_keys.id"), nullable=False)
     endpoint = Column(String(50), nullable=False)
     timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
-    reported = Column(Boolean, nullable=False, default=False)
 
     api_key = relationship("ApiKey", back_populates="usage_records")
 
@@ -143,7 +126,6 @@ def create_customer_with_key(
     *,
     email: str,
     tier: str = "free",
-    customer_id: Optional[str] = None,
 ) -> tuple["Customer", str]:
     """
     Create a customer and their first API key.
@@ -152,7 +134,6 @@ def create_customer_with_key(
     customer = Customer(
         email=email,
         tier=tier,
-        customer_id=customer_id,
     )
     session.add(customer)
     session.flush()

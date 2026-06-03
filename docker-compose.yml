@@ -9,6 +9,7 @@ services:
       # ── Core ──
       PKGPROBE_BASE_OUTPUT_DIR: /data/jobs
       DATABASE_URL: sqlite:////data/pkgprobe_api.db
+      PKGPROBE_API_AUTH_ENABLED: "${PKGPROBE_API_AUTH_ENABLED:-false}"
 
       # ── Trace VM (set these for trace/auto-wrap endpoints) ──
       TRACE_ENABLED: "${TRACE_ENABLED:-false}"
@@ -18,17 +19,6 @@ services:
       TRACE_GUEST_PASSWORD: "${TRACE_GUEST_PASSWORD:-}"
       TRACE_VMRUN_PATH: "${TRACE_VMRUN_PATH:-vmrun}"
 
-      # ── Stripe ──
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      REDACTED: "${REDACTED:-}"
-      STRIPE_SUCCESS_URL: "${STRIPE_SUCCESS_URL:-https://pkgprobe.io/billing/success?session_id={CHECKOUT_SESSION_ID}}"
-      STRIPE_CANCEL_URL: "${STRIPE_CANCEL_URL:-https://pkgprobe.io/billing/cancel}"
     restart: unless-stopped
 
 volumes:

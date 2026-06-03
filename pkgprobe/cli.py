@@ -527,8 +527,7 @@ def cloud_wrap(
     if not api_key:
         console.print(
             "[yellow]No API key configured.[/yellow]\n"
-            "Run [bold]pkgprobe login[/bold] or set PKGPROBE_API_KEY.\n"
-            "Need an account? Run [bold]pkgprobe upgrade[/bold]."
+            "Run [bold]pkgprobe login[/bold] or set PKGPROBE_API_KEY."
         )
         raise typer.Exit(1)
 
@@ -548,7 +547,7 @@ def cloud_wrap(
     if resp.status_code == 403:
         console.print(
             "[red]Access denied.[/red] Your tier does not include auto-wrap.\n"
-            "Upgrade with: [bold]pkgprobe upgrade --tier wrap[/bold]"
+            "Contact your API administrator to request wrap access."
         )
         raise typer.Exit(1)
 
@@ -579,70 +578,6 @@ def cloud_wrap(
             f"[yellow]No .intunewin artifact available.[/yellow] "
             f"Check trace results at {api_url}/v1/artifacts/{trace_id}"
         )
-
-
-@app.command("upgrade")
-def upgrade(
-    tier: str = typer.Option("pro", "--tier", "-t", help="Tier to upgrade to: pro or wrap."),
-    email: str = typer.Option("", "--email", "-e", help="Your email for the Stripe checkout."),
-) -> None:
-    """Open Stripe Checkout to upgrade your pkgprobe tier."""
-    httpx = _require_httpx()
-    api_url, api_key = _load_cloud_config()
-
-    if tier not in ("pro", "wrap"):
-        console.print("[red]Tier must be 'pro' or 'wrap'.[/red]")
-        raise typer.Exit(1)
-
-    with httpx.Client(timeout=30.0) as client:
-        resp = client.post(
-            f"{api_url}/v1/billing/checkout",
-            json={"tier": tier, "email": email},
-        )
-
-    if resp.status_code != 200:
-        console.print(f"[red]Failed to create checkout session:[/red] {resp.text}")
-        raise typer.Exit(1)
-
-    checkout_url = resp.json().get("checkout_url", "")
-    if checkout_url:
-        console.print(f"[bold]Opening checkout in your browser...[/bold]")
-        import webbrowser
-        webbrowser.open(checkout_url)
-        console.print(f"[dim]If the browser didn't open, visit:[/dim]\n{checkout_url}")
-    else:
-        console.print("[red]No checkout URL returned.[/red]")
-
-
-@app.command("billing")
-def billing() -> None:
-    """Open the Stripe Customer Portal to manage your subscription."""
-    httpx = _require_httpx()
-    api_url, api_key = _load_cloud_config()
-
-    if not api_key:
-        console.print(
-            "[yellow]No API key configured.[/yellow]\n"
-            "Run [bold]pkgprobe login[/bold] first."
-        )
-        raise typer.Exit(1)
-
-    with httpx.Client(timeout=30.0) as client:
-        resp = client.get(
-            f"{api_url}/v1/billing/portal",
-            headers={"X-API-Key": api_key},
-        )
-
-    if resp.status_code != 200:
-        console.print(f"[red]Failed to open billing portal:[/red] {resp.text}")
-        raise typer.Exit(1)
-
-    portal_url = resp.json().get("portal_url", "")
-    if portal_url:
-        console.print(f"[bold]Opening billing portal...[/bold]")
-        import webbrowser
-        webbrowser.open(portal_url)
-        console.print(f"[dim]If the browser didn't open, visit:[/dim]\n{portal_url}")
 
 
 if __name__ == "__main__":
