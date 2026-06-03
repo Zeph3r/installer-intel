@@ -4,9 +4,9 @@ Production API for pkgprobe.
 Three-tier endpoint structure:
 - /v1/analyze   (free)  -- static analysis, no VM needed
 - /v1/trace     (pro)   -- VMware trace, returns plan + manifest
-- /v1/auto-wrap (paid)  -- trace + PSADT wrapper fallback + .intunewin
+- /v1/auto-wrap        -- trace + PSADT wrapper fallback + .intunewin
 
-Auth, billing, and usage tracking are wired in via dependencies
+Authentication and usage tracking are wired in via dependencies
 from api_auth.py and api_usage.py.
 """
 
@@ -38,13 +38,13 @@ def create_production_app(
     base_output_dir: str = "./jobs",
     vmrun_path: str = "vmrun",
     trace_enabled: bool = True,
-    enable_billing: bool = True,
+    enable_auth: bool = True,
 ) -> FastAPI:
     """
     Create the production pkgprobe API.
 
     When trace_enabled is False, only /v1/analyze is available (no VM required).
-    When enable_billing is True, auth middleware and Stripe billing routes are active.
+    When enable_auth is True, API key middleware is active.
     """
     app = FastAPI(
         title="pkgprobe API",
@@ -54,15 +54,13 @@ def create_production_app(
     base_dir = Path(base_output_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
 
-    if enable_billing:
-        from .api_db import init_db, get_session_factory
+    if enable_auth:
         from .api_auth import ApiKeyAuthMiddleware
-        from .api_webhooks import router as billing_router
+        from .api_db import get_session_factory, init_db
 
         engine = init_db()
         session_factory = get_session_factory(engine)
         app.add_middleware(ApiKeyAuthMiddleware, db_session_factory=session_factory)
-        app.include_router(billing_router)
 
     def _require_trace():
         if not trace_enabled:
@@ -220,7 +218,7 @@ def create_production_app(
             "plan": plan.to_json_dict(),
         }
 
-    # ── /v1/auto-wrap (auto-wrap tier) ────────────────────────────────
+    # ── /v1/auto-wrap ────────────────────────────────────────────────────
 
     @app.post("/v1/auto-wrap")
     async def auto_wrap(

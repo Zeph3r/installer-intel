@@ -15,18 +15,18 @@ from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import Response
 
-from .api_db import ApiKey, UsageRecord, lookup_api_key
+from .api_db import ApiKey, lookup_api_key
 from .api_usage import record_usage
 
 TIER_ENDPOINT_ACCESS = {
-    "free": {"/v1/analyze", "/health", "/v1/billing/checkout", "/v1/billing/status", "/v1/billing/portal"},
-    "pro": {"/v1/analyze", "/v1/trace", "/health", "/v1/billing/checkout", "/v1/billing/status", "/v1/billing/portal"},
-    "auto_wrap": {"/v1/analyze", "/v1/trace", "/v1/auto-wrap", "/v1/artifacts", "/health", "/v1/billing/checkout", "/v1/billing/status", "/v1/billing/portal"},
+    "free": {"/v1/analyze", "/health"},
+    "pro": {"/v1/analyze", "/v1/trace", "/health"},
+    "auto_wrap": {"/v1/analyze", "/v1/trace", "/v1/auto-wrap", "/v1/artifacts", "/health"},
 }
 
-PUBLIC_ENDPOINTS = {"/health", "/v1/stripe/webhook", "/v1/billing/checkout", "/docs", "/openapi.json"}
+PUBLIC_ENDPOINTS = {"/health", "/docs", "/openapi.json"}
 
-PAID_ENDPOINTS = {"/v1/trace", "/v1/auto-wrap"}
+USAGE_TRACKED_ENDPOINTS = {"/v1/trace", "/v1/auto-wrap"}
 
 RATE_LIMITS = {
     "free": 60,
@@ -42,7 +42,7 @@ class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
     2. Validates X-API-Key header
     3. Checks tier access for the requested endpoint
     4. Applies rate limiting
-    5. Records usage for paid endpoints
+    5. Records usage for selected endpoints
     6. Injects customer context into request.state
     """
 
@@ -74,7 +74,7 @@ class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
             if not self._check_tier_access(api_key.tier, path):
                 raise HTTPException(
                     status_code=403,
-                    detail=f"Your tier ({api_key.tier}) does not have access to this endpoint. Upgrade at /v1/billing/checkout",
+                    detail=f"Your tier ({api_key.tier}) does not have access to this endpoint.",
                 )
 
             if not self._check_rate_limit(api_key.id, api_key.tier):
@@ -88,7 +88,7 @@ class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
 
             response = await call_next(request)
 
-            if path in PAID_ENDPOINTS and response.status_code < 400:
+            if path in USAGE_TRACKED_ENDPOINTS and response.status_code < 400:
                 record_usage(db_session, api_key_id=api_key.id, endpoint=path)
 
             return response
