@@ -67,7 +67,7 @@ plan** containing:
 
 ### Deployment assessment
 
--   **Packaging tier** classification: Simple, Pro, or Auto-Wrap
+-   **Packaging tier** classification: Simple, Standard, or Trace-Required
 -   **Deployment risk** rating (Low / Moderate / High)
 -   **Actionable next steps** based on detected difficulty
 -   Separate from family identification --- the same family can
@@ -116,13 +116,11 @@ plan** containing:
     `--host-procmon` (local `procmon.exe`) instead of exporting only in the guest
 -   **Debugging:** `--pause-after` skips the cleanup snapshot revert so you can
     inspect the VM
--   Writes **`trace_contract.json`** (install plan + raw diff) for upstream
-    services and a **draft** `verified_manifest.json` (local preview only;
-    **authoritative** eligibility + Intune packaging gating runs on
-    **api.pkgprobe.io**)
--   `pkgprobe-trace pack-intunewin` can build `.intunewin` only with
-    **authoritative** verification (from the cloud API trace flow) or via
-    unsafe `--allow-unverified` / `--community-pack` for local experiments
+-   Writes **`trace_contract.json`** (install plan + raw diff) and a
+    **`verified_manifest.json`** summarizing detected silent args, detection
+    anchors, and packaging eligibility from the local trace
+-   `pkgprobe-trace pack-intunewin` builds the `.intunewin` package from a
+    verified manifest produced by the trace run
 
 **Safety-first by design**\
 Default `pkgprobe analyze` is still **static analysis only** (no execution).\
@@ -276,8 +274,7 @@ This keeps analysis **fast, safe, and explainable**.
 
 -   Windows-first (intentional --- this targets Windows endpoints)
 -   EXE analysis is heuristic-based (not guaranteed)
--   Runtime tracing currently targets VMware Workstation-based Windows
-    workers (cloud worker backends are future architecture)
+-   Runtime tracing currently targets VMware Workstation-based Windows hosts
 -   `pkgprobe-trace` requires guest preparation (VMware Tools, ProcMon,
     baseline snapshot)
 -   Trace diffs are **heuristic** (ProcMon CSV); PID-tree and baseline options
@@ -301,7 +298,7 @@ This keeps analysis **fast, safe, and explainable**.
 
 -   install4j / Java-based installer detection
 -   Partial-read scanning for very large EXEs
--   Queue-native multi-job orchestration for trace + packaging
+-   Broader installer-family coverage for trace + packaging
 
 ------------------------------------------------------------------------
 
