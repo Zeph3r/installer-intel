@@ -289,7 +289,6 @@ This keeps analysis **fast, safe, and explainable**.
 
 ### v0.3.0 (current)
 
--   Packaging tier classification (Simple / Pro / Auto-Wrap)
 -   Deployment risk assessment per family
 -   Clean default CLI output with `--verbose` for detail
 -   Internal analyzer telemetry (`--telemetry`)
@@ -300,8 +299,6 @@ This keeps analysis **fast, safe, and explainable**.
 
 ### Next
 
--   Cloud API at `api.pkgprobe.io` (analyze, trace, auto-wrap)
--   CLI cloud commands (`pkgprobe cloud-wrap`)
 -   install4j / Java-based installer detection
 -   Partial-read scanning for very large EXEs
 -   Queue-native multi-job orchestration for trace + packaging
