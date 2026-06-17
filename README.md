@@ -236,22 +236,23 @@ For runtime tracing and Intune packaging setup, see:
 
 ## Supported inputs
 
-  File type     Status   Notes
-  ------------- -------- -----------------------------------------------------
-  MSI           ✅       Metadata parsed via Windows Installer APIs
-  EXE           ✅       Heuristic detection via string & signature analysis
-  MSIX / AppX   🔍       EXE wrapper detection + PowerShell guidance
+| File type   |      Status | Notes                                                                                                 |
+| ----------- | ----------: | ----------------------------------------------------------------------------------------------------- |
+| MSI         | ✅ Supported | Parses installer metadata through Windows Installer APIs and provides predictable `msiexec` guidance. |
+| EXE         | ✅ Supported | Uses static string/signature analysis, installer-family heuristics, and optional preflight probes.    |
+| MSIX / AppX |  🔍 Partial | Detects MSIX/AppX-style EXE wrappers and provides PowerShell-based deployment/detection guidance.     |
 
 ### EXE installer families detected
 
-  Family            Byte markers     Preflight (7z)   Install switches   Uninstall   Detection rules
-  ----------------- --------------- ---------------- ------------------ ----------- ----------------
-  NSIS              ✅               —                ✅                  ✅           file_exists
-  Inno Setup        ✅               —                ✅                  ✅           file_exists
-  InstallShield     ✅               —                ✅                  ✅           ARP registry
-  WiX Burn          ✅               ✅                ✅                  ✅           registry_key
-  Squirrel          ✅               ✅                ✅                  ✅           file_exists
-  MSIX/AppX Wrapper ✅               —                ✅                  ✅           powershell
+| Installer family  | Byte markers | Preflight / 7-Zip hints | Install switches | Uninstall guidance | Detection rules |
+| ----------------- | -----------: | ----------------------: | ---------------: | -----------------: | --------------- |
+| NSIS              |            ✅ |                       — |                ✅ |                  ✅ | `file_exists`   |
+| Inno Setup        |            ✅ |                       — |                ✅ |                  ✅ | `file_exists`   |
+| InstallShield     |            ✅ |                       — |                ✅ |                  ✅ | `ARP registry`  |
+| WiX Burn          |            ✅ |                       ✅ |                ✅ |                  ✅ | `registry_key`  |
+| Squirrel          |            ✅ |                       ✅ |                ✅ |                  ✅ | `file_exists`   |
+| MSIX/AppX Wrapper |            ✅ |                       — |                ✅ |                  ✅ | `PowerShell`    |
+
 
 ------------------------------------------------------------------------
 
