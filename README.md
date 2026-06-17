@@ -330,4 +330,4 @@ That's how real platform tooling should behave.
 
 ## License
 
-MIT
+GNU GENERAL PUBLIC LICENSE
